@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import pathlib
+from PIL import Image
 
 
 def show(img, points=None, mark="b*", size=(6, 6), cmap="viridis", show_axis=False):
@@ -14,12 +16,17 @@ def show(img, points=None, mark="b*", size=(6, 6), cmap="viridis", show_axis=Fal
     plt.show()
 
 
-def show_imgs(img_list, title_list=None, cmap="viridis", size=(16, 8), show_axis=False):
+def show_imgs(img_list, title_list=None, rows=1, cmap="viridis", size=(16, 8), show_axis=False):
     if title_list is not None:
         assert len(img_list) == len(title_list)
+    if type(img_list[0]) == pathlib.PosixPath or type(img_list[0]) == str:
+        show_list = [Image.open(str(img_path)) for img_path in img_list]
+    else:
+        show_list = img_list
     plt.figure(figsize=size)
-    for idx, img in enumerate(img_list):
-        plt.subplot(1, len(img_list), idx + 1)
+    assert len(show_list) % rows == 0
+    for idx, img in enumerate(show_list):
+        plt.subplot(rows, int(len(show_list) / rows), idx + 1)
         plt.imshow(img, cmap=cmap)
         if title_list is not None:
             plt.title(title_list[idx])

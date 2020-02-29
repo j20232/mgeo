@@ -1,1 +1,1 @@
-from mgeo.transform.basic import rotate, resize, equalize_histogram
+from mgeo.transform import transform2d

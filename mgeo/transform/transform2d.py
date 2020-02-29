@@ -20,7 +20,7 @@ def equalize_histogram(gray_img, nbr_bins=256):
     cdf = cdf / cdf[-1]   # normalization
     out = np.interp(gray_img.flatten(), bins[:-1], cdf)
     out = out.reshape(gray_img.shape)
-    if type(gray_img[0, 0]) is np.uint8:
+    if gray_img.dtype == "uint8":
         out = (out * 255).astype(np.uint8)
         cdf = cdf * 255
     return out, cdf
