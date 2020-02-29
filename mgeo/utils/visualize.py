@@ -28,7 +28,7 @@ def show_imgs(img_list, title_list=None, cmap="viridis", size=(16, 8), show_axis
     plt.show()
 
 
-def show_histgram(img, size=(15, 6), bins=128, cmap="viridis", show_axis=False):
+def show_histogram(img, size=(15, 6), bins=128, fill_contour=False, cmap="viridis", show_axis=False):
     assert img.ndim == 2
     plt.figure(figsize=size)
 
@@ -39,14 +39,20 @@ def show_histgram(img, size=(15, 6), bins=128, cmap="viridis", show_axis=False):
     plt.axis("equal")
     if not show_axis:
         plt.axis("off")
+    mappable0 = plt.pcolormesh(img, cmap=cmap)
+    plt.colorbar(mappable0, orientation="horizontal")
 
     # Contour
     plt.subplot(1, 3, 2)
-    plt.contour(img, origin="image", cmap=cmap)
+    if fill_contour:
+        plt.contourf(img, origin="image", cmap=cmap)
+    else:
+        plt.contour(img, origin="image", cmap=cmap)
     plt.title("Contour")
     plt.axis("equal")
     if not show_axis:
         plt.axis("off")
+    plt.colorbar(mappable0, orientation="horizontal")
 
     # Histgram
     plt.subplot(1, 3, 3)
@@ -55,7 +61,7 @@ def show_histgram(img, size=(15, 6), bins=128, cmap="viridis", show_axis=False):
     plt.show()
 
 
-def show_histgrams(img_list, title_list=None, bins=256, cmap="viridis", size=(16, 8)):
+def show_histograms(img_list, title_list=None, bins=256, cmap="viridis", size=(16, 8)):
     if title_list is not None:
         assert len(img_list) == len(title_list)
     plt.figure(figsize=size)

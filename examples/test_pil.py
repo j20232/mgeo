@@ -7,8 +7,8 @@ from mgeo import transform
 if __name__ == "__main__":
     # show image with PIL
     img = Image.open("./assets/imgs/empire.jpg")
-    img = transform.rotate(img, 10)
+    img = transform.rotate(img, 0)
     img = transform.resize(img, (512, 512))
     points = np.array([[100, 200], [100, 500], [400, 200], [400, 500]])
-    mgeo.utils.visualize.show(img, points=points)
-    mgeo.utils.visualize.show_histgram(img[:, :, 0])
+    eq_img, cdf = transform.equalize_histogram(img[:, :, 0], nbr_bins=10)
+    mgeo.utils.visualize.show_histogram(eq_img)
