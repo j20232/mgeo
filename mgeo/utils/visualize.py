@@ -42,3 +42,19 @@ def show_histgram(np_img, size=(15, 6), bins=128, show_axis=False):
     plt.hist(np_img.flatten(), bins)
     plt.title("Histgram")
     plt.show()
+
+
+def show_imgs(img_list, title_list=None, size=(16, 8), to_gray=False, show_axis=False):
+    if title_list is not None:
+        assert len(img_list) == len(title_list)
+    plt.figure(figsize=size)
+    if to_gray:
+        plt.gray()
+    for idx, img in enumerate(img_list):
+        plt.subplot(1, len(img_list), idx + 1)
+        plt.imshow(img)
+        if title_list is not None:
+            plt.title(title_list[idx])
+        if not show_axis:
+            plt.axis("off")
+    plt.show()
