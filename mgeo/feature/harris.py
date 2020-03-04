@@ -3,9 +3,14 @@ from scipy.ndimage import filters
 
 
 class Harris():
-    def __call__(self, img, sigma=3, min_dist=6, threshold=0.1):
-        response = self.__calculate_response(img, sigma)
-        return self.__get_points(response, min_dist, threshold)
+    def __init__(self, sigma=3, min_dist=6, threshold=0.1):
+        self.sigma = sigma
+        self.min_dist = min_dist
+        self.threshold = threshold
+
+    def __call__(self, img):
+        response = self.__calculate_response(img, self.sigma)
+        return self.__get_points(response, self.min_dist, self.threshold)
 
     def __calculate_response(self, img, sigma=3):
         # derivatives
