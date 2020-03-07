@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import pathlib
 from PIL import Image
@@ -79,3 +80,32 @@ def show_histograms(img_list, title_list=None, bins=256, cmap="viridis", size=(1
             plt.title(title_list[idx])
         plt.xlim(0, bins)
     plt.show()
+
+
+def cube_points(c, wid):
+    # vertex list to plot a cube
+    p = []
+
+    # bottom
+    p.append([c[0]-wid, c[1]-wid, c[2]-wid])
+    p.append([c[0]-wid, c[1]+wid, c[2]-wid])
+    p.append([c[0]+wid, c[1]+wid, c[2]-wid])
+    p.append([c[0]+wid, c[1]-wid, c[2]-wid])
+    p.append([c[0]-wid, c[1]-wid, c[2]-wid])
+
+    # top
+    p.append([c[0]-wid, c[1]-wid, c[2]+wid])
+    p.append([c[0]-wid, c[1]+wid, c[2]+wid])
+    p.append([c[0]+wid, c[1]+wid, c[2]+wid])
+    p.append([c[0]+wid, c[1]-wid, c[2]+wid])
+    p.append([c[0]-wid, c[1]-wid, c[2]+wid])
+
+    # vertical edge
+    p.append([c[0]-wid, c[1]-wid, c[2]+wid])
+    p.append([c[0]-wid, c[1]+wid, c[2]+wid])
+    p.append([c[0]-wid, c[1]+wid, c[2]-wid])
+    p.append([c[0]+wid, c[1]+wid, c[2]-wid])
+    p.append([c[0]+wid, c[1]+wid, c[2]+wid])
+    p.append([c[0]+wid, c[1]-wid, c[2]+wid])
+    p.append([c[0]+wid, c[1]-wid, c[2]-wid])
+    return np.array(p).T

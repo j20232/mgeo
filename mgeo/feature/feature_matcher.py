@@ -11,7 +11,13 @@ class FeatureMatcher():
                     p[0] - wid:p[0] + wid + 1].flatten()
                 for p in points]
 
-    def match(self, desc1, desc2, threshold=0.5):
+    def match(self, desc1, desc2, threshold=0.6, use_ncc=False):
+        if use_ncc:
+            return self.match_with_ncc(desc1, desc2, threshold)
+        else:
+            return self.match_with_lowe(desc1, desc2, threshold)
+
+    def match_with_ncc(self, desc1, desc2, threshold):
         # select correspondence points with normalized cross-correlation
         distance = -np.ones((len(desc1), len(desc2)))
         n = len(desc1[0])
@@ -27,15 +33,39 @@ class FeatureMatcher():
         match_scores = ndx[:, 0]
         return match_scores
 
-    def match_twosided(self, desc1, desc2, threshold=0.5):
-        matches_12 = self.match(desc1, desc2, threshold)
-        matches_21 = self.match(desc2, desc1, threshold)
+    def match_with_lowe(self, desc1, desc2, dist_ratio=0.6, decay=0.9999):
+        """ For each descriptor in the first image,
+            select its match in the second image.
+
+        input:
+            desc1 (descriptors for the first image),
+            desc2 (same for second image).
+        """
+
+        desc1 = np.array([d / np.linalg.norm(d) for d in desc1])
+        desc2 = np.array([d / np.linalg.norm(d) for d in desc2])
+        desc1_size = desc1.shape
+        matchscores = np.zeros((desc1_size[0]), 'int')
+        desc2t = desc2.T
+        for i in range(desc1_size[0]):
+            dotprods = decay * desc1[i, :] @ desc2t
+            # inverse cosine and sort, return index for features in second image
+            indx = np.argsort(np.arccos(dotprods))
+
+            # check if nearest neighbor has angle less than dist_ratio times 2nd
+            if np.arccos(dotprods)[indx[0]] < dist_ratio * np.arccos(dotprods)[indx[1]]:
+                matchscores[i] = int(indx[0])
+        return matchscores
+
+    def match_twosided(self, desc1, desc2, threshold=0.5, use_ncc=False):
+        matches_12 = self.match(desc1, desc2, threshold, use_ncc)
+        matches_21 = self.match(desc2, desc1, threshold, use_ncc)
 
         # delete asymmetry points
         ndx_12 = np.where(matches_12 >= 0)[0]
         for n in ndx_12:
             if matches_21[matches_12[n]] != n:
-                matches_12[n] = -1
+                matches_12[n] = -1 if use_ncc else 0
         return matches_12
 
     def show_matches(self, img1, img2, points1, points2, match_scores,

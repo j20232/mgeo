@@ -21,13 +21,6 @@ def create_rotation_matrix(a):
     return R
 
 
-def normalize_in_homogeneous_coords(points):
-    # normalize a collection of points in homogeneous coordinates
-    for row in points:
-        row /= points[-1]
-    return points
-
-
 def convert_to_homogeneous_coords(points):
     return np.vstack((points, np.ones((1, points.shape[1]))))
 
@@ -81,6 +74,37 @@ def find_homography_with_HartleyZisserman(source, target):
     H = np.linalg.inv(C2) @ H @ C1
     return H / H[2, 2]
 
+# ------------------------------ RANSAC-based ---------------------------------------
+
+
+def normalize_in_homogeneous_coords(points):
+    # normalize a collection of points in homogeneous coordinates
+    for row in points:
+        row /= points[-1] + 1e-6
+    return points
+
+
+class RansacModel():
+    """ Class for testing homography fit with ransac.py from
+        http://www.scipy.org/Cookbook/RANSAC"""
+
+    def fit(self, data):
+        """ Fit homography to four selected correspondences. """
+        data = data.T  # transpose to fit H_from_points()
+        fp = data[:3, :4]  # from points
+        tp = data[3:, :4]  # target points
+        return find_homography_with_linearDLT(fp, tp)
+
+    def get_error(self, data, H):
+        """ Apply homography to all correspondences,
+            return error for each transformed point. """
+        data = data.T
+        fp = data[:3]
+        tp = data[3:]
+        fp_transformed = H @ fp
+        fp_transformed = normalize_in_homogeneous_coords(fp_transformed)
+        return np.sqrt(np.sum((tp - fp_transformed) ** 2, axis=0))
+
 
 def find_homography_with_RANSAC(source, target, model, maxiter=1000, match_threshold=10):
     """ Robust estimation of homography H from point correspondences using RANSAC
@@ -90,9 +114,9 @@ def find_homography_with_RANSAC(source, target, model, maxiter=1000, match_thres
     """
 
     # group corresponding points
-    data = vstack((source, target))
+    data = np.vstack((source, target))
 
     # compute H and return
     H, ransac_data = ransac(data.T, model, 4, maxiter,
-                            match_theshold, 10, return_all=True)
+                            match_threshold, 10, return_all=True)
     return H, ransac_data['inliers']

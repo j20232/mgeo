@@ -10,7 +10,7 @@ class Camera():
     def project(self, X):
         # project points X to normalized image coordinates
         x = np.dot(self.P, X)
-        x /= x[2]
+        x /= x[2] + 1e-6
         return x
 
     def factorize(self):
