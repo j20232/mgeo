@@ -22,36 +22,20 @@ if __name__ == "__main__":
         "./assets/chap4/book/book_perspective.JPG"))
     sift_file0 = "./assets/chap4/book/book_frontal.sift"
     sift_file1 = "./assets/chap4/book/book_perspective.sift"
-    box = mgeo.utils.visualize.cube_points([0, 0, 0.1], 0.1)
+    box = mgeo.utils.visualize.cube_points([0, 0.0, 0.2], 0.1)
 
     sift = mgeo.feature.Sift()
     matcher = mgeo.feature.FeatureMatcher()
     l0, d0 = sift.read_features_from_file(sift_file0)
     l1, d1 = sift.read_features_from_file(sift_file1)
-
     matches = matcher.match_twosided(d0, d1)
-    # np.savetxt("./assets/chap4/book/matches.txt")
-    # matches = np.loadtxt("./assets/chap4/book/matches.txt")
-    # matches = matches.astype(np.uint8)
-
-    # plt.figure(figsize=(15, 10))
-    # sift.plot_features(img0, l0)
-    # sift.plot_features(img1, l1)
-    # plt.show()
 
     ndx = matches.nonzero()[0]
-    print(ndx[:10])
     fp = homography.convert_to_homogeneous_coords(l0[ndx, :2].T)
-    print(fp[:, :5])
-
     ndx2 = [int(matches[i]) for i in ndx]
-    print(ndx2[:10])
     tp = homography.convert_to_homogeneous_coords(l1[ndx2, :2].T)
-    print(tp[:, :5])
-
     model = homography.RansacModel()
     H = homography.find_homography_with_RANSAC(fp, tp, model)[0]
-    print(H)
 
     # Camera 1
     K = my_calibration((747, 1000))
@@ -61,7 +45,10 @@ if __name__ == "__main__":
     box_trans = homography.normalize_in_homogeneous_coords(H @ box_cam1)
 
     # Camera 2
-    cam2 = Camera(H @cam1.P)
+    cam2 = Camera(H @ cam1.P)
+    A = np.dot(np.linalg.inv(K), cam2.P[:, :3])
+    A = np.array([A[:, 0], A[:, 1], np.cross(A[:, 0], A[:, 1])]).T
+    cam2.P[:, :3] = np.dot(K, A)
     box_cam2 = cam2.project(homography.convert_to_homogeneous_coords(box))
 
     plt.figure()
@@ -78,5 +65,4 @@ if __name__ == "__main__":
     plt.imshow(img1)
     plt.plot(box_cam2[0, :], box_cam2[1, :], linewidth=3)
     plt.axis('off')
-
     plt.show()
