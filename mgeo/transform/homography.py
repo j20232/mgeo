@@ -2,6 +2,8 @@ import numpy as np
 from PIL import Image
 from scipy import linalg
 
+from .ransac import ransac
+
 
 def rotate(img, angle=0):
     if type(img) is np.ndarray:
@@ -78,3 +80,19 @@ def find_homography_with_HartleyZisserman(source, target):
 
     H = np.linalg.inv(C2) @ H @ C1
     return H / H[2, 2]
+
+
+def find_homography_with_RANSAC(source, target, model, maxiter=1000, match_threshold=10):
+    """ Robust estimation of homography H from point correspondences using RANSAC
+        (ransac.py from http://www.scipy.org/Cookbook/RANSAC).
+
+        input: source, target: (3 * n arrays) points in hom. coordinates.
+    """
+
+    # group corresponding points
+    data = vstack((source, target))
+
+    # compute H and return
+    H, ransac_data = ransac(data.T, model, 4, maxiter,
+                            match_theshold, 10, return_all=True)
+    return H, ransac_data['inliers']

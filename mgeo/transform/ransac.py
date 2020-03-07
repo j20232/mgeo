@@ -112,7 +112,7 @@ class LinearLeastSquaresModel:
     def get_error(self, data, model):
         A = np.vstack([data[:, i] for i in self.input_columns]).T
         B = np.vstack([data[:, i] for i in self.output_columns]).T
-        B_fit = scipy.dot(A, model)
+        B_fit = A @ model
         # sum squared error per row
         err_per_point = np.sum((B-B_fit)**2, axis=1)
         return err_per_point
@@ -125,12 +125,12 @@ def test():
     n_outputs = 1
     A_exact = 20 * np.random.random((n_samples, n_inputs))
     perfect_fit = 60 * np.random.normal(size=(n_inputs, n_outputs))
-    B_exact = scipy.dot(A_exact, perfect_fit)
+    B_exact = A_exact @ perfect_fit
     assert B_exact.shape == (n_samples, n_outputs)
 
     # add a little gaussian noise (linear least squares alone should handle this well)
-    A_noisy = A_exact + numpy.random.normal(size=A_exact.shape)
-    B_noisy = B_exact + numpy.random.normal(size=B_exact.shape)
+    A_noisy = A_exact + np.random.normal(size=A_exact.shape)
+    B_noisy = B_exact + np.random.normal(size=B_exact.shape)
 
     # add some outliers
     n_outliers = 100
