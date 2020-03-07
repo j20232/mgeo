@@ -1,5 +1,12 @@
 import numpy as np
+from PIL import Image
 from scipy import linalg
+
+
+def rotate(img, angle=0):
+    if type(img) is np.ndarray:
+        img = Image.fromarray(np.uint8(img))
+    return np.asarray(img.rotate(angle))
 
 
 def create_rotation_matrix(a):
@@ -10,3 +17,10 @@ def create_rotation_matrix(a):
                              [a[2], 0, -a[0]],
                              [-a[1], a[0], 0]])
     return R
+
+
+def normalize(points):
+    # normalize a collection of points in homogeneous coordinates
+    for row in points:
+        row /= points[-1]
+    return points

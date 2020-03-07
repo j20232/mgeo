@@ -1,5 +1,5 @@
 import mgeo
-from mgeo.transform import transform3d
+from mgeo.transform import homography
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     # Define rotation matrix
     r = 0.05 * np.random.rand(3)
-    rot = transform3d.create_rotation_matrix(r)
+    rot = homography.create_rotation_matrix(r)
 
     plt.figure()
     num_move = 20
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     plt.show()
 
     K = np.array([[1000, 0, 500], [0, 1000, 300], [0, 0, 1]])
-    tmp = transform3d.create_rotation_matrix([0, 0, 1])[:3, :3]
+    tmp = homography.create_rotation_matrix([0, 0, 1])[:3, :3]
     Rt = np.hstack((tmp, np.array([[50], [40], [30]])))
     camera = mgeo.transform.Camera(K@Rt)
     K1, R1, t1 = camera.factorize()
