@@ -84,7 +84,7 @@ def find_homography_with_HartleyZisserman(source, target):
 
 def find_homography_with_RANSAC(source, target, model, maxiter=1000, match_threshold=10):
     """ Robust estimation of homography H from point correspondences using RANSAC
-        (ransac.py from http://www.scipy.org/Cookbook/RANSAC).
+        (ransac.py from http: // www.scipy.org/Cookbook/RANSAC).
 
         input: source, target: (3 * n arrays) points in hom. coordinates.
     """

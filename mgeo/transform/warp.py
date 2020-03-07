@@ -4,20 +4,21 @@ from mgeo.transform import homography
 
 
 def image_in_image(img1, img2, target):
-    """Put img1 in img2 with an affine transformation
+    """
+    Put img1 in img2 with an affine transformation
     such that corners are close to target as possible.
 
     Args:
-        img1 (np.ndarray): small image
-        img2 (np.ndarray): large image
-        target (np.ndarray): homogeneous and counter-clockwise from top left
+        img1(np.ndarray): small image
+        img2(np.ndarray): large image
+        target(np.ndarray): homogeneous and counter-clockwise from top left
     """
 
     m, n = img1.shape[:2]
     source = np.array([[0, m, m, 0], [0, 0, n, n], [1, 1, 1, 1]])
 
-    # calculate and apply affine transform
-    H = homography.find_homography_with_linearDLT(source, target)
+    # calculate and apply affine transform: Please read scipy.ndimage.affine_transform
+    H = homography.find_homography_with_HartleyZisserman(target, source)
     img1_t = ndimage.affine_transform(
         img1, H[:2, :2], (H[0, 2], H[1, 2]), img2.shape[:2])
     alpha = img1_t > 0
