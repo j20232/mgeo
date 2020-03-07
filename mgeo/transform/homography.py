@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 from scipy import linalg
 
-from .ransac import ransac
+from mgeo.transform.ransac import ransac
 
 
 def rotate(img, angle=0):
