@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 from scipy import ndimage
+from mgeo.transform import homography
 
 if __name__ == "__main__":
     img = np.array(Image.open("./assets/chap3/data/empire.jpg").convert("L"))
@@ -11,4 +12,4 @@ if __name__ == "__main__":
     # mgeo.utils.visualize.show_imgs([img, img2])
 
     points = np.random.rand(3, 3)
-    points = mgeo.transform.homography.normalize(points)
+    points = homography.normalize_in_homogeneous_coords(points)
