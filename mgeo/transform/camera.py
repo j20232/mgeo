@@ -5,6 +5,7 @@ from scipy import linalg
 class Camera():
     def __init__(self, P):
         self.P = P
+        self.c = None
 
     def project(self, X):
         # project points X to normalized image coordinates
@@ -25,3 +26,9 @@ class Camera():
         self.R = T@R
         self.t = linalg.inv(self.K) @ self.P[:, 3]
         return self.K, self.R, self.t
+
+    def calculate_center(self):
+        if self.c is None:
+            self.factorize()
+            self.c = - self.R.T @ self.t
+        return self.c

@@ -39,3 +39,6 @@ if __name__ == "__main__":
     print("K1: ", K1)
     print("R1: ", K1)
     print("t1: ", t1)
+
+    c = camera.calculate_center()
+    print("c: ", c)
