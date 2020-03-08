@@ -1,12 +1,9 @@
 import mgeo
 import numpy as np
 import matplotlib.pyplot as plt
-import pygame
-from pygame.locals import *
 from PIL import Image
 from mgeo.transform import homography, Camera
 from mgeo.utils import gl
-import pygame
 
 
 def my_calibration(sz):
