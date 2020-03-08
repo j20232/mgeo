@@ -24,7 +24,7 @@ if __name__ == "__main__":
     X = np.vstack((points3D, np.ones(points3D.shape[1])))
     x = P[0].project(X)
 
-    # --------------------- epipolar line ------------------------
+    # --------------------- triangulation ------------------------
     ndx = (corr[:, 0] >= 0) & (corr[:, 1] >= 0)
     x1 = points2D[0][:, corr[ndx, 0]]
     x1 = np.vstack((x1, np.ones(x1.shape[1])))
@@ -39,4 +39,23 @@ if __name__ == "__main__":
     ax = fig.gca(projection='3d')
     ax.plot(Xtrue[0], Xtrue[1], Xtrue[2], 'r.')
     ax.plot(Xest[0], Xest[1], Xest[2], 'ko')
+    plt.show()
+
+    # ------------------- Project to 2D image ---------------------
+    corr = corr[:, 0]
+    ndx3D = np.where(corr >= 0)[0]
+    ndx2D = corr[ndx3D]
+
+    x = points2D[0][:, ndx2D]
+    x = np.vstack((x, np.ones(x.shape[1])))
+    X = points3D[:, ndx3D]
+    X = np.vstack((X, np.ones(X.shape[1])))
+    Pest = Camera(sfm.compute_P(x, X))
+    xest = Pest.project(X)
+
+    plt.figure(figsize=(8, 8))
+    plt.imshow(im1)
+    plt.plot(x[0], x[1], 'bo')
+    plt.plot(xest[0], xest[1], 'r.')
+    plt.axis('off')
     plt.show()

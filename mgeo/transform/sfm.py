@@ -69,3 +69,21 @@ def triangulate(x1, x2, P1, P2):
         raise ValueError("Number of points don't match.")
     X = [triangulate_point(x1[:, i], x2[:, i], P1, P2) for i in range(n)]
     return np.array(X).T
+
+
+def compute_P(x, X):
+    # x: 2d points (3, n), X: 3d points (4, n): homogeneous coords
+    n = x.shape[1]
+    if X.shape[1] != n:
+        raise ValueError("Number of points don't match.")
+
+    # DLT
+    M = np.zeros((3 * n, 12 + n))
+    for i in range(n):
+        M[3 * i, 0:4] = X[:, i]
+        M[3 * i + 1, 4:8] = X[:, i]
+        M[3 * i + 2, 8:12] = X[:, i]
+        M[3 * i:3 * i + 3, i + 12] = -x[:, i]
+
+    U, S, V = np.linalg.svd(M)
+    return V[-1, :12].reshape((3, 4))
