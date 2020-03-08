@@ -1,8 +1,12 @@
 import mgeo
 import numpy as np
 import matplotlib.pyplot as plt
+import pygame
+from pygame.locals import *
 from PIL import Image
 from mgeo.transform import homography, Camera
+from mgeo.utils import gl
+import pygame
 
 
 def my_calibration(sz):
@@ -23,6 +27,7 @@ if __name__ == "__main__":
     sift_file0 = "./assets/chap4/book/book_frontal.sift"
     sift_file1 = "./assets/chap4/book/book_perspective.sift"
     box = mgeo.utils.visualize.cube_points([0, 0.0, 0.2], 0.1)
+    width, height = 1000, 747
 
     sift = mgeo.feature.Sift()
     matcher = mgeo.feature.FeatureMatcher()
@@ -38,7 +43,7 @@ if __name__ == "__main__":
     H = homography.find_homography_with_RANSAC(fp, tp, model)[0]
 
     # Camera 1
-    K = my_calibration((747, 1000))
+    K = my_calibration((height, width))
     cam1 = Camera(np.hstack((K, K @ np.array([[0], [0], [-1]]))))
     box_cam1 = cam1.project(
         homography.convert_to_homogeneous_coords(box[:, :5]))
@@ -46,9 +51,9 @@ if __name__ == "__main__":
 
     # Camera 2
     cam2 = Camera(H @ cam1.P)
-    A = np.dot(np.linalg.inv(K), cam2.P[:, :3])
+    A = np.linalg.inv(K) @ cam2.P[:, :3]
     A = np.array([A[:, 0], A[:, 1], np.cross(A[:, 0], A[:, 1])]).T
-    cam2.P[:, :3] = np.dot(K, A)
+    cam2.P[:, :3] = K @ A
     box_cam2 = cam2.project(homography.convert_to_homogeneous_coords(box))
 
     plt.figure()
