@@ -24,45 +24,19 @@ if __name__ == "__main__":
     X = np.vstack((points3D, np.ones(points3D.shape[1])))
     x = P[0].project(X)
 
-    # --------------------- visualize x ------------------------
-
-    plt.figure(figsize=(8, 8))
-    plt.subplot(1, 2, 1)
-    plt.imshow(im1)
-    plt.plot(points2D[0][0], points2D[0][1], '*')
-    plt.axis('off')
-
-    plt.subplot(1, 2, 2)
-    plt.imshow(im1)
-    plt.plot(x[0], x[1], 'r.')
-    plt.axis('off')
-
-    plt.show()
-
     # --------------------- epipolar line ------------------------
-
     ndx = (corr[:, 0] >= 0) & (corr[:, 1] >= 0)
     x1 = points2D[0][:, corr[ndx, 0]]
     x1 = np.vstack((x1, np.ones(x1.shape[1])))
     x2 = points2D[1][:, corr[ndx, 1]]
     x2 = np.vstack((x2, np.ones(x2.shape[1])))
 
-    F = sfm.compute_fundamental(x1, x2)
-    e = sfm.compute_epipole(F)
-    print(e)
+    Xtrue = points3D[:, ndx]
+    Xtrue = np.vstack((Xtrue, np.ones(Xtrue.shape[1])))
+    Xest = sfm.triangulate(x1, x2, P[0].P, P[1].P)
 
-    # plot epipolar line
-    plt.figure(figsize=(8, 8))
-    plt.imshow(im1)
-    for i in range(5):
-        sfm.plot_epipolar_line(im1, F, x2[:, i], e, False)
-    plt.axis('off')
-    plt.show()
-
-    # --------------------- epipole on img2 ----------------------
-    plt.figure(figsize=(10, 10))
-    plt.imshow(im2)
-    for i in range(5):
-        plt.plot(x2[0, i], x2[1, i], 'o')
-    plt.axis('off')
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.gca(projection='3d')
+    ax.plot(Xtrue[0], Xtrue[1], Xtrue[2], 'r.')
+    ax.plot(Xest[0], Xest[1], Xest[2], 'ko')
     plt.show()
