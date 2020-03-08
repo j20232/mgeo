@@ -1,49 +1,7 @@
 import numpy as np
-import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from pygame.locals import *
-
-
-def setup(width, height, title):
-    pygame.init()
-    pygame.display.set_mode((width, height), OPENGL | DOUBLEBUF)
-    pygame.display.set_caption(title)
-
-
-def draw_background(bmp_name, width, height):
-    bg_image = pygame.image.load(bmp_name).convert()
-    bg_data = pygame.image.tostring(bg_image, "RGBX", 1)
-
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-    # Link texture
-    glEnable(GL_TEXTURE_2D)
-    glBindTexture(GL_TEXTURE_2D, glGenTextures(1))
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, bg_data)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-
-    # Fill window
-    glBegin(GL_QUADS)
-    glTexCoord2f(0.0, 0.0)
-    glVertex3f(-1.0, -1.0, -1.0)
-
-    glTexCoord2f(1.0, 0.0)
-    glVertex3f(1.0, -1.0, -1.0)
-
-    glTexCoord2f(1.0, 1.0)
-    glVertex3f(1.0, 1.0, -1.0)
-
-    glTexCoord2f(0.0, 1.0)
-    glVertex3f(-1.0, 1.0, -1.0)
-    glEnd()
-
-    glDeleteTextures(1)
 
 
 def set_projection_from_intrinsic(K, width, height, near=0.1, far=100.0):
